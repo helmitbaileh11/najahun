@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>طلب الأنشطة - عمادة شؤون الطلبة</title>
+    <style>
+        /* إعدادات أساسية */
+        body {
+            font-family: 'Rubik', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: #004080;
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        header img#logo {
+            width: 100px;
+            display: block;
+            margin: 0 auto 10px;
+        }
+
+        header h1 {
+            font-size: 2em;
+            margin: 0;
+        }
+
+        /* إعدادات رئيسية للصفحة */
+        main {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        form label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        form input, form textarea, form select {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+
+        form input:focus, form textarea:focus, form select:focus {
+            border-color: #004080;
+            outline: none;
+        }
+
+        form button {
+            background-color: #004080;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s;
+        }
+
+        form button:hover {
+            background-color: #003366;
+        }
+
+        #archive-link a {
+            display: inline-block;
+            margin-top: 20px;
+            color: #004080;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        #archive-link a:hover {
+            color: #002244;
+        }
+
+        /* إعدادات الفوتر */
+        footer {
+            background-color: #004080;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDWdUHK3Zp3sEJotIw6eMLmO0wAkIRePLU",
+            authDomain: "activityrequests.firebaseapp.com",
+            projectId: "activityrequests",
+            storageBucket: "activityrequests.appspot.com",
+            messagingSenderId: "898482145620",
+            appId: "1:898482145620:web:abd8bd624f16a1460ea0c1",
+            measurementId: "G-D63R1Q09BC"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // معالجة نموذج تقديم الطلب
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('activity-form').addEventListener('submit', async function(event) {
+                event.preventDefault();
+
+                const activityName = document.getElementById('activity-name').value;
+                const activityDetails = document.getElementById('activity-details').value;
+                const activityLocation = document.getElementById('activity-location').value;
+                const activityDate = document.getElementById('activity-date').value;
+                const activityOpinion = document.getElementById('activity-opinion').value;
+                const recipients = Array.from(document.getElementById('recipients').selectedOptions).map(option => option.value);
+
+                try {
+                    await addDoc(collection(db, "activity-requests"), {
+                        activityName,
+                        activityDetails,
+                        activityLocation,
+                        activityDate,
+                        activityOpinion,
+                        recipients,
+                        status: "pending"
+                    });
+                    alert('تم إرسال الطلب بنجاح');
+                } catch (e) {
+                    console.error("Error adding document: ", e);
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <header>
+        <img src="logo.png" alt="Logo" id="logo">
+        <h1>طلب الأنشطة - عمادة شؤون الطلبة</h1>
+    </header>
+
+    <main>
+        <form id="activity-form">
+            <label for="activity-name">اسم الجهة القائمة على النشاط:</label>
+            <input type="text" id="activity-name" name="activity-name" required>
+
+            <label for="activity-details">تفاصيل النشاط:</label>
+            <textarea id="activity-details" name="activity-details" required></textarea>
+
+            <label for="activity-location">مكان النشاط:</label>
+            <input type="text" id="activity-location" name="activity-location" required>
+
+            <label for="activity-date">تاريخ النشاط:</label>
+            <input type="date" id="activity-date" name="activity-date" required>
+
+            <label for="activity-opinion">رأي عميد شؤون الطلبة:</label>
+            <textarea id="activity-opinion" name="activity-opinion" required></textarea>
+
+            <label for="recipients">اختر الجهات لإرسال الطلب إليها:</label>
+            <select id="recipients" name="recipients" multiple required>
+                <option value="university-admin">إدارة الجامعة</option>
+                <option value="university-security">أمن الجامعة</option>
+                <option value="engineering-dean">عميد كلية الهندسة</option>
+                <option value="medicine-dean">عميد كلية الطب</option>
+                <option value="law-dean">عميد كلية القانون</option>
+                <option value="arts-dean">عميد كلية الفنون</option>
+                <!-- Add more options as needed -->
+            </select>
+
+            <button type="submit">إرسال الطلب</button>
+        </form>
+
+        <div id="archive-link">
+            <a href="archive.html">الذهاب إلى أرشيف الأنشطة</a>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2024 جامعة النجاح الوطنية بواسطة حلمي طبيله</p>
+    </footer>
+</body>
+</html>

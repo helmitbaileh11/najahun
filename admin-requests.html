@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>طلبات الأنشطة - إدارة الجامعة</title>
+    <style>
+
+        body {
+            font-family: 'Rubik', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: #004080;
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        header img#logo {
+            width: 100px;
+            display: block;
+            margin: 0 auto 10px;
+        }
+
+        header h1 {
+            font-size: 2em;
+            margin: 0;
+        }
+
+        /* إعدادات رئيسية للصفحة */
+        main {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        main h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+        }
+
+        ul#requests-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        ul#requests-list li {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        ul#requests-list li h3 {
+            margin-top: 0;
+        }
+
+        ul#requests-list li p {
+            margin: 5px 0;
+        }
+
+        ul#requests-list li button {
+            margin-right: 10px;
+            padding: 8px 12px;
+            font-size: 0.9em;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        ul#requests-list li button.approve {
+            background-color: #28a745;
+            color: #fff;
+        }
+
+        ul#requests-list li button.reject {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+        ul#requests-list li button:hover {
+            opacity: 0.9;
+        }
+
+        ul#requests-list li textarea {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+
+        footer {
+            background-color: #004080;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDWdUHK3Zp3sEJotIw6eMLmO0wAkIRePLU",
+            authDomain: "activityrequests.firebaseapp.com",
+            projectId: "activityrequests",
+            storageBucket: "activityrequests.appspot.com",
+            messagingSenderId: "898482145620",
+            appId: "1:898482145620:web:abd8bd624f16a1460ea0c1",
+            measurementId: "G-D63R1Q09BC"
+        };
+
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        $(document).ready(async function() {
+            const requestsList = $('#requests-list');
+            const querySnapshot = await getDocs(collection(db, "activity-requests"));
+
+            querySnapshot.forEach((docSnapshot) => {
+                const data = docSnapshot.data();
+                const listItem = $(`
+                    <li>
+                        <h3>${data.activityName}</h3>
+                        <p><strong>تفاصيل النشاط:</strong> ${data.activityDetails}</p>
+                        <p><strong>مكان النشاط:</strong> ${data.activityLocation}</p>
+                        <p><strong>تاريخ النشاط:</strong> ${data.activityDate}</p>
+                        <p><strong>رأي عميد شؤون الطلبة:</strong> ${data.activityOpinion}</p>
+                        <p><strong>الحالة:</strong> ${data.status || 'قيد الانتظار'}</p>
+                        <textarea placeholder="أضف ملاحظة هنا..." data-id="${docSnapshot.id}"></textarea>
+                        <button class="approve" data-id="${docSnapshot.id}">موافقة</button>
+                        <button class="reject" data-id="${docSnapshot.id}">رفض</button>
+                    </li>
+                `);
+                requestsList.append(listItem);
+            });
+
+            $('#requests-list').on('click', 'button.approve', async function() {
+                const id = $(this).data('id');
+                const note = $(this).siblings('textarea').val();
+                try {
+                    await updateDoc(doc(db, "activity-requests", id), {
+                        status: "تمت الموافقة",
+                        note: note 
+                    });
+                    alert('تمت الموافقة على الطلب');
+                    location.reload(); 
+                } catch (e) {
+                    console.error("Error updating document: ", e);
+                    alert('حدث خطأ أثناء الموافقة على الطلب.');
+                }
+            });
+
+            $('#requests-list').on('click', 'button.reject', async function() {
+                const id = $(this).data('id');
+                const note = $(this).siblings('textarea').val();
+                try {
+                    await updateDoc(doc(db, "activity-requests", id), {
+                        status: "تم رفض الطلب",
+                        note: note
+                    });
+                    alert('تم رفض الطلب');
+                    location.reload(); 
+                } catch (e) {
+                    console.error("Error updating document: ", e);
+                    alert('حدث خطأ أثناء رفض الطلب.');
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <header>
+        <img src="logo.png" alt="Logo" id="logo">
+        <h1>طلبات الأنشطة - إدارة الجامعة</h1>
+    </header>
+
+    <main>
+        <h2>قائمة الطلبات</h2>
+        <ul id="requests-list">
+            <!-- سيتم ملء الطلبات هنا بواسطة JavaScript -->
+        </ul>
+    </main>
+
+    <footer>
+        <p>© 2024 جامعة النجاح الوطنية بواسطة حلمي طبيله</p>
+    </footer>
+</body>
+</html>

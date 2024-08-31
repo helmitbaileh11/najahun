@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول</title>
+    <style>
+        body {
+            font-family: 'Rubik', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        header {
+            width: 100%;
+            height: 400px; /* تكبير البانر ليغطي الجزء العلوي */
+            background-image: url('banner.jpg');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+        }
+
+        header img#logo {
+            position: absolute;
+            top: 20px;
+            width: 120px;
+            /* تنسيق الشعار داخل البانر */
+        }
+
+        .container {
+            max-width: 400px;
+            margin: -50px auto 0; /* تحريك النموذج ليلتصق بالبانر */
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #004080;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #003366;
+        }
+
+        .error {
+            color: #dc3545;
+            font-size: 14px;
+            text-align: center;
+        }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDWdUHK3Zp3sEJotIw6eMLmO0wAkIRePLU",
+            authDomain: "activityrequests.firebaseapp.com",
+            projectId: "activityrequests",
+            storageBucket: "activityrequests.appspot.com",
+            messagingSenderId: "898482145620",
+            appId: "1:898482145620:web:abd8bd624f16a1460ea0c1",
+            measurementId: "G-D63R1Q09BC"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginForm = document.getElementById('login-form');
+            loginForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+
+                // كلمات السر مخصصة لكل مستخدم
+                const credentials = {
+                    'studentAdmin': '1111',
+                    'universityAdmin': '1111'
+                };
+
+                try {
+                    // تحقق من اسم المستخدم وكلمة المرور
+                    if (credentials[username] && credentials[username] === password) {
+                        if (username === 'studentAdmin') {
+                            window.location.href = 'dean-requests.html';
+                        } else if (username === 'universityAdmin') {
+                            window.location.href = 'admin-requests.html';
+                        }
+                    } else {
+                        document.getElementById('error').textContent = 'اسم المستخدم أو كلمة المرور غير صحيحة';
+                    }
+                } catch (error) {
+                    document.getElementById('error').textContent = 'حدث خطأ أثناء تسجيل الدخول';
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <header>
+        <img src="logo.png" alt="Logo" id="logo">
+    </header>
+
+    <div class="container">
+        <h2>تسجيل الدخول</h2>
+        <form id="login-form">
+            <input type="text" id="username" placeholder="اسم المستخدم" required>
+            <input type="password" id="password" placeholder="كلمة المرور" required>
+            <button type="submit">تسجيل الدخول</button>
+            <p id="error" class="error"></p>
+        </form>
+    </div>
+</body>
+</html>

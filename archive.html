@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أرشيف الأنشطة</title>
+    <style>
+        /* إعدادات أساسية */
+        body {
+            font-family: 'Rubik', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: #004080;
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        header img#logo {
+            width: 100px;
+            display: block;
+            margin: 0 auto 10px;
+        }
+
+        header h1 {
+            font-size: 2em;
+            margin: 0;
+        }
+
+        /* إعدادات رئيسية للصفحة */
+        main {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        main h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+        }
+
+        ul#archive-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        ul#archive-list li {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        ul#archive-list li h3 {
+            margin-top: 0;
+        }
+
+        ul#archive-list li p {
+            margin: 5px 0;
+        }
+
+        ul#archive-list li span.status {
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        ul#archive-list li span.note {
+            display: block;
+            margin-top: 10px;
+            font-style: italic;
+            color: #666;
+        }
+
+        /* إعدادات الفوتر */
+        footer {
+            background-color: #004080;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDWdUHK3Zp3sEJotIw6eMLmO0wAkIRePLU",
+            authDomain: "activityrequests.firebaseapp.com",
+            projectId: "activityrequests",
+            storageBucket: "activityrequests.appspot.com",
+            messagingSenderId: "898482145620",
+            appId: "1:898482145620:web:abd8bd624f16a1460ea0c1",
+            measurementId: "G-D63R1Q09BC"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        $(document).ready(async function() {
+            const archiveList = $('#archive-list');
+            const querySnapshot = await getDocs(collection(db, "activity-requests"));
+
+            querySnapshot.forEach((docSnapshot) => {
+                const data = docSnapshot.data();
+                const status = data.status || 'قيد الانتظار'; // حالة الطلب
+                const note = data.note || ''; // الملاحظة
+
+                const listItem = $(`
+                    <li>
+                        <h3>${data.activityName}</h3>
+                        <p><strong>تفاصيل النشاط:</strong> ${data.activityDetails}</p>
+                        <p><strong>مكان النشاط:</strong> ${data.activityLocation}</p>
+                        <p><strong>تاريخ النشاط:</strong> ${data.activityDate}</p>
+                        <p><strong>رأي عميد شؤون الطلبة:</strong> ${data.activityOpinion}</p>
+                        <p><strong>الحالة:</strong> <span class="status">${status}</span></p>
+                        ${note ? `<p><strong>ملاحظة:</strong> <span class="note">${note}</span></p>` : ''}
+                    </li>
+                `);
+                archiveList.append(listItem);
+            });
+        });
+    </script>
+</head>
+<body>
+    <header>
+        <img src="logo.png" alt="Logo" id="logo">
+        <h1>أرشيف الأنشطة</h1>
+    </header>
+
+    <main>
+        <h2>الأرشيف</h2>
+        <ul id="archive-list">
+            <!-- سيتم ملء الأرشيف هنا بواسطة JavaScript -->
+        </ul>
+    </main>
+
+    <footer>
+        <p>© 2024 جامعة النجاح الوطنية بواسطة حلمي طبيله</p>
+    </footer>
+</body>
+</html>
